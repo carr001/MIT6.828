@@ -1,0 +1,39 @@
+附录A
+	数据线，控制线，地址线
+	读写IO和读写内存本质上没什么区别
+	多级缓存本质上也可以看成寄存器和内存
+附录B
+	BIOS将控制权转移到从引导扇区(引导磁盘的第一个512字节扇区)加载的代码。引导扇区包含引导加载程序:将内核加载到内存中的指令。BIOS在内存地址0x7c00处加载引导扇区，然后跳转(设置处理器的%ip)到该地址。当启动加载程序开始执行时，处理器将模拟Intel 8088，加载程序的工作是将处理器置于更现代的操作模式，将xv6内核从磁盘加载到内存中，然后将控制权转移到内核。
+
+指令获取：cs,数据获取：ds,读取堆栈：SS
+	denote what memory is used for different parts of a program
+AX BX CX DX:通用寄存器，一般用于存储：
+	data movement and arithmetic instructions
+	AX 称为累加器,常用于存放算术逻辑运算中的操作数,另外所有的I/O指令都使用累加器与外设接口传送信息
+	BX 称为基址寄存器,常用来存放访问内在时的基地址,
+	CX 称为计数寄存器,在循环和串操作指令中用作计数器
+	DX 称为数据寄存器,在寄存器间接寻址中的I/O指令中存放I/O端口的地址
+
+	如果键盘控制器输出端口的第二位低，第21个物理地址位
+	总是清除；如果高，则第21位正常工作。引导加载程序必须启用
+	使用端口0x64和0x60上键盘控制器的I/O的第21个地址位
+	real mode:使用16位模式
+	protect mode:使用32位模式
+	在保护模式下，段寄存器是段描述符表的索引，每一个表什么一个基本物理地址，最大虚拟地址叫做limit，这些允许的地址是保护模式下保护的内存：kernel可以使用他们来确保一个程序只访问自己的内存。
+	xv6基本上使用，这个表有一个NULL entry,一个是指向可执行的代码，一个指向数据，flag=1，说明运行在32模式，逻辑地址和物理地址一一对应。
+	boot执行lgdt，则加载 global descriptor table，还有一个指向gdt的指针 gdtdesc
+	
+
+
+pmap.c
+	assert 
+		pgdir	  	virtual dir addr
+		PTE_ADDR  	find physical addr of page table entry
+		PTX      	page table index
+		PDX		page Dirx  index
+		dic_entry_ptr   specific dic entry
+
+
+
+		0,0   1&0   1
+		

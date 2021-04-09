@@ -1,0 +1,27 @@
+#########################exporting more system calls:
+	1. sh < script > out 
+	2.gcc x.c ; ./a.out         gcc x.c && ./a.out
+	3.	(echo one; echo two) > out
+	4.	sleep 2 &
+
+##########################system call
+	1.open just return a int, why not a pointer?
+		a.nice interaction with fork
+		b.FDs help make programs more general purpose: don't need special cases for
+    files vs console vs pipe
+		c.shell pipelines only work for programs w/ common formats (lines of text)
+
+	
+
+##########################OS orgnization
+	1.Hardware support for isolation
+		a.Processors support user mode and kernel mode(directly interact with hardware)	
+
+	2.systems calls switch between user and kernel mode,what to load into kernel mode?
+		concepts(kernel mode ,kernel interface)	
+		a.monolithic kernel: all os
+			kernel interface ~= system call interface
+		b.micro kernel: many OS service run as ordianry usr program
+			kernel interface != system call interface
+
+

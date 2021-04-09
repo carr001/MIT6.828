@@ -1,0 +1,42 @@
+###########################Code: the first address space##########################
+	1.how the kernel creates the first address space
+	2.how the kernel creates and starts the first process, and the first system call that that process makes
+
+	pc boot 
+		when pc power on,paging not enabled , virtual = physical
+		load kernal at 0x100000, 2 reasons
+		set a page table
+		entry 0, entry 512,kernal instruction and data limited to 4M
+		load pa of entrypgdir to cr3, va
+		set cr0 to enable paging hardware
+		so far, kernal exec at low memory
+	to work at high memory	
+		make stack pointer %esp point to memory, used as stack
+		all symbol have high memory
+		jump to main, also high addr
+		now kernal runs within it own adress space	
+#########################Code: creating the first process##########################
+	1.how kernel creates process and ensure isolation between kernel and user-level process,and process themselvs
+	step
+		1.create the first process by calling userinits, allocate a slot, init process state
+		2.Allocproc scan proc table for unused state slot, if find one ,init it
+		
+		3.allocate stack for process kernel thread
+	allocproc
+		1.set up process kernel stack
+		2.set up new process with a specially prepared kernel stack and set of kernel reg
+		3.
+		...
+		transfer from kernel to user via interruption
+		kernel stack is ready
+	ready to execu
+		1.process need memory to store the program, need a page table to point to the memory
+		2.setupkvm creat a page table
+			
+#########################Code Runing the first process##############################
+Allocproc将initproc的p->context->eip设置为forkret，这样ret启动exe-
+切叉。在第一次调用（即这次调用）中，forkret（2783）运行不能从main运行的初始化函数，因为它们必须在具有自己内核堆栈的常规进程的上下文中运行。然后，forkret回来了。Allocproc安排在弹出p->context之后堆栈上的最上面的单词是trapret，因此现在trapret开始执行，并将%esp设置为p->tf。Trapret使用pop指令从trap帧还原寄存器，就像swtch对内核上下文所做的那样：popal还原常规寄存器，然后popl指令还原%gs、%fs、%es和%ds。addl跳过trapno和errcode两个字段。最后，iret指令从堆栈中弹出%cs、%eip、%flags、%esp和%ss。陷阱帧的内容已传输到CPU状态，因此处理器将在陷阱帧中指定的%eip上继续。对于initproc，这意味着虚拟地址0，initcode.S的第一条指令。
+
+此时，%eip为零，%esp为4096。这些是进程地址空间中的虚拟地址。处理器的分页硬件将它们转换成物理地址。allocuvm设置进程的页表，以便虚拟地址零引用为此进程分配的物理内存，并设置一个标志（PTE_），告诉分页硬件允许用户代码访问该内存。userinit（2514）设置了%cs的低位以在CPL=3时运行进程的用户代码，这意味着用户代码只能使用设置了PTE_的页，并且不能修改诸如%cr3之类的敏感硬件寄存器。因此，进程只能使用自己的内存。
+
+

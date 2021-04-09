@@ -1,0 +1,56 @@
+what is isolation?
+	1.process is the unit of isolation
+	2.prevent a process from wrecking the operation system it self(memory)
+	3.when bugs occur, dont get kernel isolated
+	4.do not let process wreck hardware & kernel
+
+methods to achieve isolation are :
+  	1.user/kernel mode flag
+	    	to protect h/w
+			button 2 bits of %cs:
+				CPL = 0/3 usr/kernel
+			inspect every thing that may change %cs
+		to protect kernel mode memory			
+			kernel must config control regs, page tables, &c to protect other stuff
+
+  	2.address spaces
+		paging hardware
+		os tell paging h/w how to switch page table when switching process
+		PTE bit saying that usr-mode 
+
+  	3.timeslicing
+		h/w provides a periodic "clock interrupt",
+		forcefully suspends current process, jumps into kernel, which can switch to a different process
+		kernel must save/restore process state (registers)
+
+  	4.system call interface
+		CPL=3 and executing user code
+ 		CPL=0 and executing from entry point in kernel code
+		a.combine instruction(CPL=0&CPL=3)
+		b.only limited entry point
+		b.system call return sets CPL=3 before returning to user code
+
+#################Xv6 the first process######################
+goal: trace the first process and its first syscall
+	1.overview:
+		each process have its own address space,thread, user/kernel stack.see proc.h
+		the first address space 
+	2.first address space:
+		kernel space 4M	
+	3.first process(userinit)
+		a.set up stack:allocproc()
+		b.Fill in kernel part of address space
+		c.Fill in user part of address space
+		d.Setup trapframe to exit kernel
+		e.Set process to runnable
+	4.Running first process
+		a.Scheduler selects a runnable process
+		b.switchuvm
+  		c.single step through swtch
+	5.Executing first system call
+				
+
+
+
+
+
